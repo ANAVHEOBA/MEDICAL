@@ -38,7 +38,7 @@ function SuccessPopup({ isVisible, onClose, transactionId }) {
 }
 
 const RegisterPharmacy = () => {
-  const doctorStep = useSelector((state) => state.pharmacyStep.value);
+  const pharmacyStep = useSelector((state) => state.pharmacyStep.value);
   const dispatch = useDispatch();
 
   const [pharmacyPersonaData, setPharmacyPersonalData] = useState({
@@ -176,7 +176,7 @@ const RegisterPharmacy = () => {
         },
         preferenceData: pharmacyPreferenceData,
         walletAddress: address,
-      }, 'anavheoba');
+      }, 'pharmacies');
 
       let patientRegisterContract = new ethers.Contract(
         process.env.NEXT_PUBLIC_DEDOCTOR_SMART_CONTRACT || "",
@@ -214,7 +214,7 @@ const RegisterPharmacy = () => {
   const registrationSteps = [
     {
       id: 1,
-      title: "Registration",
+      title: "Pharmacy Information",
       subTitle: "Enter Pharmacy Details",
       component: (
         <PharmacyPersonal
@@ -228,8 +228,8 @@ const RegisterPharmacy = () => {
     },
     {
       id: 2,
-      title: "Owner Details",
-      subTitle: "Enter pharmacy owner Details",
+      title: "Owner Information",
+      subTitle: "Enter Pharmacy Owner Details",
       component: (
         <OwnerDetails
           pharmacyOwnerData={pharmacyOwnerData}
@@ -243,7 +243,7 @@ const RegisterPharmacy = () => {
     {
       id: 3,
       title: "Pharmacy Verification",
-      subTitle: "Identification of your Pharmacy",
+      subTitle: "Upload Pharmacy Verification Documents",
       component: (
         <PharmacyVerification
           pharmacyVerificationData={pharmacyVerificationData}
@@ -257,7 +257,7 @@ const RegisterPharmacy = () => {
     {
       id: 4,
       title: "Preferences",
-      subTitle: "Setup Your Preferences for your Account",
+      subTitle: "Set Preferences for Pharmacy",
       component: (
         <PreferencePharmacy
           pharmacyPreferenceData={pharmacyPreferenceData}
@@ -277,40 +277,56 @@ const RegisterPharmacy = () => {
           {registrationSteps.map((registrationStep) => (
             <div
               key={registrationStep.id}
-              className="flex space-x-2 px-5 py-3 bg-white border rounded-lg shadow-md"
+              className="flex space-x-2 px-4 py-3 border shadow bg-slate-50 rounded-md"
             >
-              <div className="flex items-center justify-center w-10 h-10 text-white bg-blue-500 rounded-full">
-                {registrationStep.id}
-              </div>
-              <div className="flex flex-col justify-center">
-                <h2 className="text-lg font-semibold">{registrationStep.title}</h2>
-                <p className="text-sm text-gray-600">{registrationStep.subTitle}</p>
+              <input
+                type="radio"
+                checked={pharmacyStep === registrationStep.step}
+                readOnly
+                onClick={() =>
+                  dispatch(pharmacyUpdateStep(registrationStep.step))
+                }
+              />
+              <div className="flex flex-col w-full">
+                <h1 className="font-semibold text-sm">
+                  {registrationStep.title}
+                </h1>
+                <p className="text-xs">{registrationStep.subTitle}</p>
               </div>
             </div>
           ))}
         </div>
-        <div className="md:flex-grow p-5 bg-white rounded-lg shadow-md">
-          {registrationSteps[doctorStep - 1].component}
+        <div className="bg-white px-4 py-2 border shadow-md flex-1 rounded-md">
+          {registrationSteps.map((registrationStep) => (
+            <div
+              key={registrationStep.id}
+              className={
+                pharmacyStep === registrationStep.step ? "block" : "hidden"
+              }
+            >
+              {registrationStep.component}
+            </div>
+          ))}
         </div>
       </div>
-      <SuccessPopup 
-        isVisible={showSuccessPopup} 
-        onClose={() => setShowSuccessPopup(false)} 
-        transactionId={transactionId} 
-      />
+
       {loading && (
-        <div className="flex justify-center mt-5">
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <ColorRing
             visible={true}
             height="80"
             width="80"
             ariaLabel="blocks-loading"
-            wrapperStyle={{}}
-            wrapperClass="blocks-wrapper"
-            colors={['#4fa94d', '#f57c00', '#e50000', '#00bfff', '#b200b2']}
+            colors={["#833AB4", "#C13584", "#E1306C", "#F56040", "#FFDC80"]}
           />
         </div>
       )}
+
+      <SuccessPopup
+        isVisible={showSuccessPopup}
+        onClose={() => setShowSuccessPopup(false)}
+        transactionId={transactionId}
+      />
     </div>
   );
 };
